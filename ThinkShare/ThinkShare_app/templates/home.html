@@ -9,11 +9,13 @@
 <section>
     {% for article in articles %}
     <div>
-        {% for img in article.articleimages_set.all %}
-        <img src="images/no-image-available.png" alt="article_images">
-        {% empty %}
-        <img src="{{ img.image_url.url }}" alt="article_images">
-        {% endfor %}
+       {% if article.articleimages_set.all %}
+      {% for img in article.articleimages_set.all %}
+        <img src="{{ img.image_url.url }}" alt="article_images" width="200px">
+      {% endfor %}
+    {% else %}
+      <img src="{% static 'images/no-image-available.png' %}" alt="no-image">
+    {% endif %}
         <h2>{{article.title}}</h2>
         <p>{{ article.content }}</p>
         <p>Category: {{ article.category.category_name }}</p>

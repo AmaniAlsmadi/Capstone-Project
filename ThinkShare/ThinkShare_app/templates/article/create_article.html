@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <label for="images">Upload Images (Ctrl + Click to select multiple)</label>
+    <input type="file" name="images" id="images" multiple>
+
+    <button type="submit">Create Article</button>
+</form>
+
+{% endblock %}

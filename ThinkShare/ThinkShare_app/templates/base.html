@@ -24,6 +24,7 @@
             <li>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
+                    <li><a href="{% url 'create_article' %}">Create Article</a></li>
                     <button type="submit">Logout</button>
                 </form>
             </li>
