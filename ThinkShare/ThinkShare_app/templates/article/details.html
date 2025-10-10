@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="article-detail">
+    <h1>{{ article.title }}</h1>
+    <p><strong>By:</strong> {{ article.user.username }}</p>
+    <p><strong>Category:</strong> {{ article.category.category_name }}</p>
+    <p><small>Posted on {{ article.created_at|date:"F j, Y, g:i a" }}</small></p>
+
+    <hr>
+
+    <div class="content">
+        <p>{{ article.content|linebreaks }}</p>
+        {% if article.link %}
+            <p><a href="{{ article.link }}" target="_blank">{{ article.link }}</a></p>
+        {% endif %}
+    </div>
+
+    <div class="images">
+      {% for img in article.articleimages_set.all %}
+            <img src="{{ img.image_url.url }}" alt="Article image" style="width:200px; margin:5px; border-radius:10px;">
+        {% empty %}
+            <p>No images uploaded.</p>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h3>Comments ({{ comments.count }})</h3>
+    {% for comment in comments %}
+        <div style="border:1px solid #ddd; padding:10px; margin-bottom:10px; border-radius:10px;">
+            <strong>{{ comment.user.username }}</strong>
+            <small style="color:gray;"> • {{ comment.created_at|timesince }} ago</small>
+            <p>{{ comment.content }}</p>
+        </div>
+    {% empty %}
+        <p>No comments yet. Be the first to comment!</p>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+        <hr>
+        <h4>Add a Comment</h4>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Post Comment</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Login</a> to comment.</p>
+    {% endif %}
+</div>
+{% endblock %}

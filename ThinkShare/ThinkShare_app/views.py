@@ -1,7 +1,7 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from .models import Article, ArticleImages
 from django.contrib.auth.views import LoginView
-from .forms import CustomUserCreationForm, ArticleForm
+from .forms import CustomUserCreationForm, ArticleForm,CommentForm
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -51,3 +51,26 @@ def create_article(request):
         form = ArticleForm()
 
     return render(request, 'article/create_article.html', {'form': form})
+
+def article_datails(request, pk):
+    article = get_object_or_404(Article, pk=pk)
+    comments = article.comments.all().order_by('-created_at')
+
+    form = None
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.article = article
+                comment.user = request.user
+                comment.save()
+                return redirect('details', pk=article.pk)
+        else:
+            form = CommentForm()
+
+    return render(request, 'article/details.html', {
+        'article': article,
+        'comments': comments,
+        'form': form,
+    })
