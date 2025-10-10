@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="login-container card">
+    <h2>📚 Welcome Back to Book Shelf</h2>
+    <p class="subtitle">Sign in to continue exploring your favorite books</p>
+
+    {% if error_message %}
+        <p class="error-message">{{ error_message }}</p>
+    {% endif %}
+
+    <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit" class="btn submit">Login</button>
+    </form>
+
+    <p class="register-link">
+        Don’t have an account? <a href="{% url 'signup' %}">Sign up here</a>
+    </p>
+</div>
+{% endblock %}

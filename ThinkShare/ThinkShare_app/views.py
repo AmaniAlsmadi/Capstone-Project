@@ -1,3 +1,32 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from .models import Article
+from django.contrib.auth.views import LoginView
+from .forms import CustomUserCreationForm
+from django.contrib import messages
+from django.contrib.auth import logout
 
-# Create your views here.
+
+def home(request):
+    articles = Article.objects.all()
+    return render(request, 'home.html', {'articles': articles})
+
+def about(request):
+    return render(request, 'about.html')
+
+class CustomLoginView(LoginView):
+    template_name = 'registration/login.html'
+
+def signup(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Account created successfully! You can log in now.")
+            return redirect('login')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')

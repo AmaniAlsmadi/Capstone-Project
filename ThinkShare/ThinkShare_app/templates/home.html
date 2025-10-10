@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<section>
+    {% for article in articles %}
+    <div>
+        {% for img in article.articleimages_set.all %}
+        <img src="images/no-image-available.png" alt="article_images">
+        {% empty %}
+        <img src="{{ img.image_url.url }}" alt="article_images">
+        {% endfor %}
+        <h2>{{article.title}}</h2>
+        <p>{{ article.content }}</p>
+        <p>Category: {{ article.category.category_name }}</p>
+        <p>By:{{ article.user.username }}</p>
+        <p>{{ article.created_at }}</p>
+    </div>
+    {% empty %}
+      <p>No article available right now.</p>
+    {% endfor %}
+</section>
+{% endblock %}
