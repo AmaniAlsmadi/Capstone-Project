@@ -1,0 +1,69 @@
+
+.three-dot {
+  position: relative;
+  display: inline-block;
+}
+
+.three-dot summary {
+  list-style: none;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.three-dot summary::-webkit-details-marker { display: none; }
+.three-dot summary::marker { display: none; }
+
+
+.three-dot .dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 140px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  border-radius: 8px;
+  padding: 6px 6px;
+  z-index: 50;
+  display: none; 
+}
+
+.three-dot[open] .dropdown { display: block; }
+
+.three-dot .dropdown a,
+.three-dot .dropdown form button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  color: #333;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+.three-dot .dropdown a:hover,
+.three-dot .dropdown form button:hover {
+  background: rgba(0,0,0,0.03);
+}
+
+.three-dot .dropdown .delete {
+  color: #b33;
+}
+
+.three-dot summary .dots {
+  display: inline-block;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+@media (max-width: 480px) {
+  .three-dot .dropdown { right: auto; left: 0; min-width: 120px; }
+}

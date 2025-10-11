@@ -17,6 +17,13 @@ class Article(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Categories, on_delete=models.CASCADE)
+    
+    def likes_count(self):
+        return self.votes.filter(value=1).count()
+
+    def dislikes_count(self):
+        return self.votes.filter(value=-1).count()
+    
     def __str__(self):
         return self.title
     
@@ -39,16 +46,16 @@ class Comment(models.Model):
         return self.content
     
 class Vote(models.Model):
-    Value = models.IntegerField()
+    value = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    article = models.ForeignKey(Article,on_delete=models.CASCADE)
+    article = models.ForeignKey(Article,on_delete=models.CASCADE, related_name='votes')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('article', 'user')
 
     def __str__(self):
-        return str(self.Value)
+        return f"{self.user.username} → {self.article.title}: {self.value}"
 
 
 

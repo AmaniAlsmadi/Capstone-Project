@@ -1,10 +1,12 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Article, ArticleImages
+from .models import Article, ArticleImages,Vote,Comment
 from django.contrib.auth.views import LoginView
 from .forms import CustomUserCreationForm, ArticleForm,CommentForm
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
+from django.urls import reverse
 
 
 def home(request):
@@ -52,13 +54,14 @@ def create_article(request):
 
     return render(request, 'article/create_article.html', {'form': form})
 
-def article_datails(request, pk):
+def article_details(request, pk):
     article = get_object_or_404(Article, pk=pk)
     comments = article.comments.all().order_by('-created_at')
 
-    form = None
-    if request.user.is_authenticated:
-        if request.method == "POST":
+    form = CommentForm() if request.user.is_authenticated else None
+
+    if request.user.is_authenticated and request.method == "POST":
+        if 'comment' in request.POST:
             form = CommentForm(request.POST)
             if form.is_valid():
                 comment = form.save(commit=False)
@@ -66,11 +69,84 @@ def article_datails(request, pk):
                 comment.user = request.user
                 comment.save()
                 return redirect('details', pk=article.pk)
-        else:
-            form = CommentForm()
 
-    return render(request, 'article/details.html', {
+        elif 'vote' in request.POST:
+            value = int(request.POST.get('vote'))
+            existing_vote = Vote.objects.filter(article=article, user=request.user).first()
+
+            if existing_vote:
+                if existing_vote.value == value:
+                    existing_vote.delete()  
+                else:
+                    existing_vote.value = value
+                    existing_vote.save()
+            else:
+                Vote.objects.create(article=article, user=request.user, value=value)
+            return redirect('details', pk=article.pk)
+
+    context = {
         'article': article,
         'comments': comments,
         'form': form,
+    }
+    return render(request, 'article/details.html', context)
+
+@login_required
+def update_article(request, pk):
+    article = get_object_or_404(Article, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = ArticleForm(request.POST, request.FILES, instance=article)
+        if form.is_valid():
+            form.save()
+            return redirect('details', pk=pk)
+    else:
+        form = ArticleForm(instance=article)
+    return render(request, 'article/update_article.html', {'form': form, 'article': article})
+
+
+@login_required
+def delete_article(request, pk):
+    article = get_object_or_404(Article, pk=pk, user=request.user)
+    delete_url = reverse('article_delete', args=[article.pk])  
+    
+    if request.method == 'POST':
+        article.delete()
+        return redirect('home')
+
+    return render(request, 'article/confirm_delete.html', {
+        'object_type': 'article',
+        'object_content': article.title,
+        'delete_url': delete_url,
+        'cancel_url': reverse('details', args=[article.pk])
+    })
+
+
+@login_required
+def update_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk, user=request.user)
+    if request.method == "POST":
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('details', pk=comment.article.pk)
+    else:
+        form = CommentForm(instance=comment)
+    return render(request, 'article/update_comment.html', {'form': form, 'comment': comment})
+
+
+@login_required
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk, user=request.user)
+    article_id = comment.article.pk
+
+    if request.method == "POST":
+        comment.delete()
+        return redirect('details', pk=article_id)
+    
+    cancel_url = reverse('details', args=[article_id]) if comment.article else '/'
+
+    return render(request, 'article/confirm_delete.html', {
+        'object_type': 'comment',
+        'object_content': comment.content,
+        'cancel_url': cancel_url
     })
