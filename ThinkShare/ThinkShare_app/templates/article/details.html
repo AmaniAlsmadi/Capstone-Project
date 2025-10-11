@@ -6,108 +6,123 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-start">
-        <h1 class="mb-3 text-primary">{{ article.title }}</h1>
-            {% if user.is_authenticated and user == article.user %}
-    <details class="three-dot">
-        <summary>⋯</summary>
-        <div class="dropdown">
-            <a href="{% url 'article_edit' article.pk %}">Edit</a>
-        <a href="{% url 'article_delete' article.pk %}" class="btn btn-danger btn-sm">
-    Delete
-</a>
+<div class="article-container">
 
-        </div>
-    </details>
-    {% endif %}
-        <p class="text-muted mb-1"><strong>By:</strong> {{ article.user.username }}</p>
-        <p class="text-muted mb-1"><strong>Category:</strong> {{ article.category.category_name }}</p>
-        <p class="text-muted"><small>Posted on {{ article.created_at|date:"F j, Y, g:i a" }}</small></p>
+    <div class="article-header">
+        <h1>{{ article.title }}</h1>
 
-        <hr>
-
-        <div class="images mb-4 d-flex flex-wrap">
-            {% for img in article.articleimages_set.all %}
-            <img src="{{ img.image_url.url }}" alt="Article image" class="img-thumbnail me-2 mb-2"
-                style="width:200px; border-radius:10px;">
-            {% empty %}
-            <p>No images uploaded.</p>
-            {% endfor %}
-        </div>
-
-        <div class="content mb-3">
-            <p>{{ article.content|linebreaks }}</p>
-            {% if article.link %}
-            <p><a href="{{ article.link }}" target="_blank">{{ article.link }}</a></p>
-            {% endif %}
-        </div>
-
-        <hr>
-
-        <div class="vote-section text-center mb-3">
-            {% if user.is_authenticated %}
-            <form method="POST" class="d-inline">
-                {% csrf_token %}
-                <button type="submit" name="vote" value="1" class="btn btn-outline-success rounded-pill px-4">
-                    👍 Like ({{ article.likes_count }})
-                </button>
-            </form>
-
-            <form method="POST" class="d-inline ms-2">
-                {% csrf_token %}
-                <button type="submit" name="vote" value="-1" class="btn btn-outline-danger rounded-pill px-4">
-                    👎 Dislike ({{ article.dislikes_count }})
-                </button>
-            </form>
-            {% else %}
-            <p><a href="{% url 'login' %}" class="text-decoration-none">Login</a> to vote.</p>
-            {% endif %}
-        </div>
-
-        <hr>
-
-        <h3 class="mb-3">Comments ({{ comments.count }})</h3>
-        {% for comment in comments %}
-       <div class="card-body position-relative">
-    <div class="d-flex justify-content-between">
-        <div>
-            <strong>{{ comment.user.username }}</strong>
-            <small class="text-muted"> • {{ comment.created_at|timesince }} ago</small>
-            <p class="mt-2 mb-0">{{ comment.content }}</p>
-        </div>
-
-        {% if user.is_authenticated and user == comment.user %}
-        <details class="three-dot">
-            <summary>⋯</summary>
-            <div class="dropdown">
-                <a href="{% url 'comment_edit' comment.pk %}">Edit</a>
-<a href="{% url 'comment_delete' comment.pk %}" class="btn btn-danger btn-sm">
-    Delete
-</a>
-
+        {% if user.is_authenticated and user == article.user %}
+        <details class="menu-three-dot">
+            <summary><i class="fa-solid fa-ellipsis-vertical"></i></summary>
+            <div class="menu-dropdown">
+                <a href="{% url 'article_edit' article.pk %}">Edit</a>
+                <a href="{% url 'article_delete' article.pk %}" class="delete-link">Delete</a>
             </div>
         </details>
         {% endif %}
     </div>
-</div>
+
+    <div class="article-meta">
+        <span>{{ article.category.category_name }}</span>
+        <span>By: {{ article.user.username }}</span>
+        <span>{{ article.created_at|date:"F j, Y, g:i a" }}</span>
+    </div>
+
+    <div id="slider-{{ article.id }}" class="image-slider">
+        <div class="slides">
+            {% for img in article.articleimages_set.all %}
+            <div class="slide"><img src="{{ img.image_url.url }}" alt="Article image"></div>
+            {% empty %}
+            <div class="slide"><img src="{% static 'images/no-image-available.png' %}" alt="No image"></div>
+            {% endfor %}
+        </div>
+        <button class="prev" onclick="prevSlide('{{ article.id }}')">&#10094;</button>
+        <button class="next" onclick="nextSlide('{{ article.id }}')">&#10095;</button>
+    </div>
+
+    <div class="article-content">
+        <p>{{ article.content|linebreaks }}</p>
+        {% if article.link %}
+        <p><a href="{{ article.link }}" target="_blank">Article Link</a></p>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <div class="vote-section">
+        {% if user.is_authenticated %}
+        <form method="POST" class="vote-form">
+            {% csrf_token %}
+            <button type="submit" name="vote" value="1">
+                {% if user_liked %}
+                <i class="fa-solid fa-thumbs-up"></i>
+                {% else %}
+                <i class="fa-regular fa-thumbs-up"></i>
+                {% endif %}
+                <span>{{ article.likes_count }}</span>
+            </button>
+        </form>
+
+        <form method="POST" class="vote-form">
+            {% csrf_token %}
+            <button type="submit" name="vote" value="-1">
+                {% if user_disliked %}
+                <i class="fa-solid fa-thumbs-down"></i>
+                {% else %}
+                <i class="fa-regular fa-thumbs-down"></i>
+                {% endif %}
+                <span>{{ article.dislikes_count }}</span>
+            </button>
+        </form>
+        {% else %}
+        <p><a href="{% url 'login' %}">Login</a> to vote.</p>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <div class="comments-section">
+        <h3>Comments ({{ comments.count }})</h3>
+
+        {% for comment in comments %}
+        <div class="comment-box">
+            <div class="comment-header">
+                <div>
+                    <strong>{{ comment.user.username }}</strong>
+                    <small class="text-muted">• {{ comment.created_at|timesince }} ago</small>
+                </div>
+
+                {% if user.is_authenticated and user == comment.user %}
+                <details class="menu-three-dot">
+                    <summary><i class="fa-solid fa-ellipsis-vertical"></i></summary>
+                    <div class="menu-dropdown">
+                        <a href="{% url 'comment_edit' comment.pk %}">Edit</a>
+                        <a href="{% url 'comment_delete' comment.pk %}" class="delete-link">Delete</a>
+                    </div>
+                </details>
+                {% endif %}
+            </div>
+
+            <p class="comment-text">{{ comment.content }}</p>
+        </div>
         {% empty %}
         <p class="text-muted">No comments yet. Be the first to comment!</p>
         {% endfor %}
-
-        {% if user.is_authenticated %}
-        <hr>
-        <h4>Add a Comment</h4>
-        <form method="POST" class="mt-3">
-            {% csrf_token %}
-            <div class="mb-3">
-                {{ form.as_p }}
-            </div>
-            <button type="submit" name="comment" class="btn btn-primary rounded-pill px-4">Post Comment</button>
-        </form>
-        {% else %}
-        <p><a href="{% url 'login' %}" class="text-decoration-none">Login</a> to comment.</p>
-        {% endif %}
     </div>
+
+    {% if user.is_authenticated %}
+    <hr>
+    <div class="comment-form">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" name="comment">Add</button>
+        </form>
+    </div>
+    {% else %}
+    <p><a href="{% url 'login' %}" class="text-decoration-none">Login</a> to comment.</p>
+    {% endif %}
 </div>
+
+<script src="{% static 'js/slider.js' %}"></script>
 {% endblock %}

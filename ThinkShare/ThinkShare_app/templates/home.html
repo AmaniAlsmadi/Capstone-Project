@@ -7,24 +7,26 @@
 
 {% block content %}
 <section>
-    {% for article in articles %}
-    <a href="{% url 'details' article.id %}">
-    <div>
-       {% if article.articleimages_set.all %}
-      {% for img in article.articleimages_set.all %}
-        <img src="{{ img.image_url.url }}" alt="article_images" width="200px">
-      {% endfor %}
-    {% else %}
-      <img src="{% static 'images/no-image-available.png' %}" alt="no-image">
-    {% endif %}
-        <h2>{{article.title}}</h2>
-        <p>{{ article.content }}</p>
-        <p>Category: {{ article.category.category_name }}</p>
-        <p>By:{{ article.user.username }}</p>
-        <p>{{ article.created_at }}</p>
-    </div></a>
-    {% empty %}
-      <p>No article available right now.</p>
-    {% endfor %}
+  {% for article in articles %}
+  <a href="{% url 'details' article.id %}" class="card-link">
+  <div class="card">
+    <div class="card-image">
+      {% if article.articleimages_set.first %}
+        <img src="{{ article.articleimages_set.first.image_url.url }}" alt="article_image">
+      {% else %}
+        <img src="{% static 'images/no-image-available.png' %}" alt="no-image">
+      {% endif %}
+    </div>
+
+    <div class="card-content">
+      <h2>{{ article.title }}</h2>
+      <p>{{ article.content|truncatechars:100 }}</p>
+      <span class="category">{{ article.category.category_name }}</span>
+      <span class="author" >By: {{ article.user.username }}</span>
+      <small>{{ article.created_at }}</small>
+    </div>
+  </div>
+  </a>
+  {% endfor %}
 </section>
 {% endblock %}

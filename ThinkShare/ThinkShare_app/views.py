@@ -60,6 +60,9 @@ def article_details(request, pk):
 
     form = CommentForm() if request.user.is_authenticated else None
 
+    user_liked = article.liked_by(request.user) if request.user.is_authenticated else False
+    user_disliked = article.disliked_by(request.user) if request.user.is_authenticated else False
+
     if request.user.is_authenticated and request.method == "POST":
         if 'comment' in request.POST:
             form = CommentForm(request.POST)
@@ -69,14 +72,13 @@ def article_details(request, pk):
                 comment.user = request.user
                 comment.save()
                 return redirect('details', pk=article.pk)
-
         elif 'vote' in request.POST:
             value = int(request.POST.get('vote'))
             existing_vote = Vote.objects.filter(article=article, user=request.user).first()
 
             if existing_vote:
                 if existing_vote.value == value:
-                    existing_vote.delete()  
+                    existing_vote.delete()
                 else:
                     existing_vote.value = value
                     existing_vote.save()
@@ -88,8 +90,11 @@ def article_details(request, pk):
         'article': article,
         'comments': comments,
         'form': form,
+        'user_liked': user_liked,
+        'user_disliked': user_disliked,
     }
     return render(request, 'article/details.html', context)
+
 
 @login_required
 def update_article(request, pk):

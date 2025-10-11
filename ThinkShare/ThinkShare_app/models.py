@@ -10,22 +10,32 @@ class Categories(models.Model):
         return self.category_name
     
     
+from django.contrib.auth.models import User
+from django.db import models
+
 class Article(models.Model):
     title = models.CharField(max_length=300)
     content = models.CharField(max_length=3000)
-    link = models.CharField(max_length=1000)
+    link = models.CharField(max_length=1000, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Categories, on_delete=models.CASCADE)
-    
+
     def likes_count(self):
         return self.votes.filter(value=1).count()
 
     def dislikes_count(self):
         return self.votes.filter(value=-1).count()
     
+    def liked_by(self, user):
+        return self.votes.filter(user=user, value=1).exists()
+
+    def disliked_by(self, user):
+        return self.votes.filter(user=user, value=-1).exists()
+    
     def __str__(self):
         return self.title
+
     
 class ArticleImages(models.Model):
     image_url = models.ImageField(upload_to='article_image/')

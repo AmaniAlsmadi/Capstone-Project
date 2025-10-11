@@ -129,6 +129,14 @@ MEDIA_URL = '/media/'
 
 STATIC_URL = 'static/'
 
+import os
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'ThinkShare_app', 'static'),
+]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
