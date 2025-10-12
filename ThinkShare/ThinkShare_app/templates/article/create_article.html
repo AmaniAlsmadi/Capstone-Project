@@ -6,18 +6,17 @@
 {% endblock %}
 {% block content %}
 <div class="container mt-4">
-<h2>Add Article</h2>
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
+    <h2>Add Article</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
 
-    <label for="images" class="label">Upload Images (Ctrl + Click to select multiple)</label>
-    <input type="file" name="images" id="images" multiple>
-                <div class="form-buttons">
-
-    <button type="submit" class="btn">Add</button>
-                </div>
-</form>
+        <label for="images" class="label">Upload Images (Ctrl + Click to select multiple)</label>
+        <input type="file" name="images" id="images" multiple>
+        <div class="form-buttons">
+            <button type="submit" class="btn">Add</button>
+        </div>
+    </form>
 </div>
 
 {% endblock %}

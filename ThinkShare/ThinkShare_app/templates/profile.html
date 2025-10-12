@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ user.username }}'s Profile</h2>
+
+    <div class="user-info">
+        <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tab-buttons">
+        <button class="tab-btn active" onclick="openTab(event, 'comments')">Comments</button>
+        <button class="tab-btn" onclick="openTab(event, 'votes')">Votes</button>
+    </div>
+
+  <div  id="comments" class="tab-content" style="display: block;">
+        <h3>Your Comments</h3>
+        {% if user_comments %}
+        <ul class="comments-list">
+            {% for comment in user_comments %}
+            <li>
+                <p>{{ comment.content }}</p>
+                <small>On: <a href="{% url 'details' pk=comment.article.pk %}">{{ comment.article.title }}</a> | {{ comment.created_at|date }}</small>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>You haven't made any comments yet.</p>
+        {% endif %}
+    </div>
+
+    <div id="votes" class="tab-content" style="display: none;">
+        <h3>Your Votes</h3>
+        {% if user_votes %}
+            <ul class="votes-list">
+                {% for vote in user_votes %}
+                    <li>
+                        Voted on: <a href="{% url 'details' pk=vote.article.pk %}">{{ vote.article.title }}</a> | {{ vote.created_at|date }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You haven't voted on any articles yet.</p>
+        {% endif %}
+    </div>
+</div>
+</div>
+
+<script src="{% static 'js/tabs.js' %}"></script>
+
+{% endblock %}

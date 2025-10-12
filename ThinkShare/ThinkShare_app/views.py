@@ -155,3 +155,16 @@ def delete_comment(request, pk):
         'object_content': comment.content,
         'cancel_url': cancel_url
     })
+
+@login_required
+def profile_view(request):
+    user = request.user
+    user_comments = Comment.objects.filter(user=user).order_by('-created_at')
+    user_votes = Vote.objects.filter(user=user).order_by('-created_at')
+    
+    return render(request, 'profile.html', {
+        'user': user,
+        'user_comments': user_comments,
+        'user_votes': user_votes
+    })
+

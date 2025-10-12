@@ -6,19 +6,21 @@
 {% endblock %}
 
 {% block content %}
-<div class="login-container card">
-    <h2>📚 Welcome Back to Book Shelf</h2>
-    <p class="subtitle">Sign in to continue exploring your favorite books</p>
+<div class="container mt-4">
+    <h2><i class="fa-regular fa-newspaper"></i> Welcome Back to ThinkShare</h2>
+    <p class="subtitle">Sign in to continue exploring new article!</p>
 
     {% if error_message %}
-        <p class="error-message">{{ error_message }}</p>
+    <p class="error-message">{{ error_message }}</p>
     {% endif %}
 
     <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="hidden" name="next" value="{{ next }}">
-        <button type="submit" class="btn submit">Login</button>
+        <div class="form-buttons">
+            <button type="submit" class="btn">Login</button>
+        </div>
     </form>
 
     <p class="register-link">
