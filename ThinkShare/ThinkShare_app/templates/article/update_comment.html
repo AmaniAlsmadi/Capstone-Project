@@ -1,12 +1,18 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/update_comment.css' %}">
+{% endblock %}
 {% block content %}
 <div class="container mt-4">
-    <h4>Edit Comment</h4>
+    <h4>Update Comment</h4>
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Update Comment</button>
+        <div class="form-buttons">
+        <button type="submit" class="btn">Update</button>
         <a href="{% url 'details' pk=comment.article.pk %}" class="btn btn-secondary">Cancel</a>
-    </form>
+   </div> </form>
 </div>
 {% endblock %}

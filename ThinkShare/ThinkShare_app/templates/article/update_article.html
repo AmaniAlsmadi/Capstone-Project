@@ -1,12 +1,18 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/update_article.css' %}">
+{% endblock %}
 {% block content %}
 <div class="container mt-4">
     <h2>Edit Article</h2>
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
+                <div class="form-buttons">
         <button type="submit" class="btn btn-primary">Update Article</button>
         <a href="{% url 'details' pk=article.pk %}" class="btn btn-secondary">Cancel</a>
-    </form>
+    </div></form>
 </div>
 {% endblock %}
