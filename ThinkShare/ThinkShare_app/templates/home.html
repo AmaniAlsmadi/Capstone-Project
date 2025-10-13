@@ -6,36 +6,5 @@
 {% endblock %}
 
 {% block content %}
-<section>
-  {% for article in articles %}
-  {% if user.is_authenticated %}
-  {% if article.is_bookmarked %}
-  <a href="{% url 'toggle_bookmark' article.id %}" class="bookmark active">
-    <i class="fa-solid fa-bookmark fa-2xl"></i></a>
-  {% else %}
-  <a href="{% url 'toggle_bookmark' article.id %}" class="bookmark">
-    <i class="fa-regular fa-bookmark fa-2xl"></i></a>
-  {% endif %}
-  {% endif %}
-  <a href="{% url 'details' article.id %}" class="card-link">
-    <div class="card">
-      <div class="card-image">
-        {% if article.articleimages_set.first %}
-        <img src="{{ article.articleimages_set.first.image_url.url }}" alt="article_image">
-        {% else %}
-        <img src="{% static 'images/no-image-available.png' %}" alt="no-image">
-        {% endif %}
-      </div>
 
-      <div class="card-content">
-        <h2>{{ article.title }}</h2>
-        <p>{{ article.formatted_content|truncatechars:100 }}</p>
-        <span class="category">{{ article.category.category_name }}</span>
-        <span class="author">By: {{ article.user.username }}</span>
-        <small>{{ article.created_at }}</small>
-      </div>
-    </div>
-  </a>
-  {% endfor %}
-</section>
 {% endblock %}

@@ -6,53 +6,149 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>{{ user.username }}'s Profile</h2>
+<div class="dashboard-container">
 
-    <div class="user-info">
-        <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-    </div>
+  <div class="sidebar">
+      <button class="tab-btn active" onclick="openTab(event, 'user')">My Profile</button>
+      <button class="tab-btn" onclick="openTab(event, 'update')">Update Profile</button>
+      <button class="tab-btn" onclick="openTab(event, 'password')">Change Password</button>
+      <button class="tab-btn" onclick="openTab(event, 'articles')">My Articles</button>
+      <button class="tab-btn" onclick="openTab(event, 'comments')">Comments</button>
+      <button class="tab-btn" onclick="openTab(event, 'votes')">Votes</button>
+  </div>
 
-    <div class="tabs-container">
-        <div class="tab-buttons">
-        <button class="tab-btn active" onclick="openTab(event, 'comments')">Comments</button>
-        <button class="tab-btn" onclick="openTab(event, 'votes')">Votes</button>
-    </div>
+  <div class="content">
 
-  <div  id="comments" class="tab-content" style="display: block;">
-        <h3>Your Comments</h3>
-        {% if user_comments %}
-        <ul class="comments-list">
-            {% for comment in user_comments %}
-            <li>
-                <p>{{ comment.content }}</p>
-                <small>On: <a href="{% url 'details' pk=comment.article.pk %}">{{ comment.article.title }}</a> | {{ comment.created_at|date }}</small>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p>You haven't made any comments yet.</p>
-        {% endif %}
-    </div>
+      <div id="user" class="tab-content" style="display: block;">
+          <h2>{{ user.username }}'s Profile</h2>
+          <div class="user-info">
+              <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+              <p><strong>Email:</strong> {{ user.email }}</p>
+          </div>
+      </div>
 
-    <div id="votes" class="tab-content" style="display: none;">
-        <h3>Your Votes</h3>
-        {% if user_votes %}
-            <ul class="votes-list">
-                {% for vote in user_votes %}
-                    <li>
-                        Voted on: <a href="{% url 'details' pk=vote.article.pk %}">{{ vote.article.title }}</a> | {{ vote.created_at|date }}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>You haven't voted on any articles yet.</p>
-        {% endif %}
-    </div>
+
+      <div id="update" class="tab-content" style="display: none;">
+          <h3>Update Your Information</h3>
+          <form method="POST" class="update-form">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="update_profile">
+
+              <label>First Name</label>
+              <input type="text" name="first_name" value="{{ user.first_name }}" required>
+
+              <label>Last Name</label>
+              <input type="text" name="last_name" value="{{ user.last_name }}" required>
+
+              <label>Email</label>
+              <input type="email" name="email" value="{{ user.email }}" required>
+
+              <button type="submit">Save Changes</button>
+          </form>
+      </div>
+
+      <div id="password" class="tab-content" style="display: none;">
+          <h3>Change Password</h3>
+          <form method="POST" class="update-form">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="change_password">
+
+              <label>Current Password</label>
+              <input type="password" name="old_password" required>
+
+              <label>New Password</label>
+              <input type="password" name="new_password1" required>
+
+              <label>Confirm New Password</label>
+              <input type="password" name="new_password2" required>
+
+              <button type="submit">Update Password</button>
+          </form>
+      </div>
+
+      <div id="articles" class="tab-content" style="display: none;">
+          <h3>Your Articles</h3>
+          {% if user_article %}
+          <ul class="articles-list">
+              {% for article in user_article %}
+              <li>
+                  <p><a href="{% url 'details' pk=article.pk %}">{{ article.title }}</a></p>
+                  <small>On: {{ article.created_at|date }}</small>
+              </li>
+              {% endfor %}
+          </ul>
+          {% else %}
+          <p>You haven't made any articles yet.</p>
+          {% endif %}
+      </div>
+
+      <div id="comments" class="tab-content" style="display: none;">
+          <h3>Your Comments</h3>
+          {% if user_comments %}
+          <ul class="comments-list">
+              {% for comment in user_comments %}
+              <li>
+                  <p>{{ comment.content }}</p>
+                  <small>On: <a href="{% url 'details' pk=comment.article.pk %}">{{ comment.article.title }}</a> | {{ comment.created_at|date }}</small>
+              </li>
+              {% endfor %}
+          </ul>
+          {% else %}
+          <p>You haven't made any comments yet.</p>
+          {% endif %}
+      </div>
+
+
+      <div id="votes" class="tab-content" style="display: none;">
+          <h3>Your Votes</h3>
+          {% if user_votes %}
+          <ul class="votes-list">
+              {% for vote in user_votes %}
+              <li>
+                  Voted on: <a href="{% url 'details' pk=vote.article.pk %}">{{ vote.article.title }}</a> | {{ vote.created_at|date }}
+              </li>
+              {% endfor %}
+          </ul>
+          {% else %}
+          <p>You haven't voted on any articles yet.</p>
+          {% endif %}
+      </div>
+  </div>
 </div>
-</div>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script type="application/json" id="django-messages-json">
+[
+  {% for message in messages %}
+    {
+      "text": "{{ message|escapejs }}",
+      "type": "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'warning' in message.tags %}warning{% else %}info{% endif %}"
+    }{% if not forloop.last %},{% endif %}
+  {% endfor %}
+]
+</script>
+
+<script>
+  (function(){
+    const jsonEl = document.getElementById('django-messages-json');
+    if (!jsonEl) return;
+
+    try {
+      const msgs = JSON.parse(jsonEl.textContent || '[]');
+      msgs.forEach(msg => {
+        Swal.fire({
+          icon: msg.type,
+          title: msg.text,
+          showConfirmButton: false,
+          timer: 2500,
+          toast: true,
+          position: 'top-end'
+        });
+      });
+    } catch (err) {
+      console.error('Failed to parse Django messages JSON:', err);
+    }
+  })();
+</script>
 <script src="{% static 'js/tabs.js' %}"></script>
-
 {% endblock %}

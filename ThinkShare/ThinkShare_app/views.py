@@ -1,23 +1,71 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Article, ArticleImages,Vote,Comment,BookMark
+from .models import Article, ArticleImages,Vote,Comment,BookMark,Categories
 from django.contrib.auth.views import LoginView
 from .forms import CustomUserCreationForm, ArticleForm,CommentForm,ContactForm
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Count
 from django.urls import reverse
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import User
 
 
 def home(request):
-    articles = Article.objects.all()
+    latest_articles = Article.objects.select_related('user').order_by('-created_at')[:6]
+    categories = Categories.objects.all()[:6]
+    trending_articles = (
+        Article.objects.annotate(vote_count=Count('votes'))
+        .order_by('-vote_count')[:6]
+    )
+    top_authors = (
+        User.objects.annotate(article_count=Count('article'))
+        .order_by('-article_count')[:6]
+    )
+
+    return render(request, 'home.html', {
+        'latest_articles': latest_articles,
+        'categories': categories,
+        'trending_articles': trending_articles,
+        'top_authors': top_authors
+    })
+
+def articles(request):
+    sort_by = request.GET.get('sort_by', 'created_at')
+    category_id = request.GET.get('category')
+    author_name = request.GET.get('author_name', '').strip()
+
+    articles = Article.objects.all().annotate(vote_count=Count('votes'))
+
+    if category_id:
+        articles = articles.filter(category_id=category_id)
+
+    if author_name:
+        articles = articles.filter(user__username__icontains=author_name)
+
+    if sort_by == 'category':
+        articles = articles.order_by('category__category_name')
+    elif sort_by == 'vote':
+        articles = articles.order_by('-vote_count')
+    elif sort_by == 'author':
+        articles = articles.order_by('user__username')
+    else:  
+        articles = articles.order_by('-created_at')
+
     if request.user.is_authenticated:
         for article in articles:
             article.is_bookmarked = article.bookmark_set.filter(user=request.user).exists()
-    return render(request, 'home.html', {'articles': articles})
 
-def about(request):
-    return render(request, 'about.html')
+    categories = Categories.objects.all()
+
+    return render(request, 'article/articles_view.html', {
+        'articles': articles,
+        'sort_by': sort_by,
+        'categories': categories,
+        'selected_category': category_id,
+        'author_name': author_name
+    })
 
 class CustomLoginView(LoginView):
     template_name = 'registration/login.html'
@@ -175,14 +223,47 @@ def delete_comment(request, pk):
 @login_required
 def profile_view(request):
     user = request.user
-    user_comments = Comment.objects.filter(user=user).order_by('-created_at')
-    user_votes = Vote.objects.filter(user=user).order_by('-created_at')
-    
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'update_profile':
+            user.first_name = request.POST.get('first_name')
+            user.last_name = request.POST.get('last_name')
+            user.email = request.POST.get('email')
+            user.save()
+            messages.success(request, 'Your profile has been updated successfully!')
+            return redirect('profile')
+
+        elif action == 'change_password':
+            old_password = request.POST.get('old_password')
+            new_password1 = request.POST.get('new_password1')
+            new_password2 = request.POST.get('new_password2')
+
+            if not check_password(old_password, user.password):
+                messages.error(request, 'Your current password is incorrect.')
+            elif new_password1 != new_password2:
+                messages.error(request, 'New passwords do not match.')
+            elif len(new_password1) < 8:
+                messages.error(request, 'New password must be at least 8 characters.')
+            else:
+                user.set_password(new_password1)
+                user.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Password changed successfully!')
+                return redirect('profile')
+
+    user_article = Article.objects.filter(user=user)
+    user_comments = Comment.objects.filter(user=user)
+    user_votes = Vote.objects.filter(user=user)
+
     return render(request, 'profile.html', {
         'user': user,
+        'user_article': user_article,
         'user_comments': user_comments,
-        'user_votes': user_votes
+        'user_votes': user_votes,
     })
+
 
 @login_required
 def toggle_bookmark(request, article_id):
