@@ -49,6 +49,7 @@ def create_article(request):
                 ArticleImages.objects.create(article=article, image_url=f)
 
             return redirect('home')
+        
     else:
         form = ArticleForm()
 

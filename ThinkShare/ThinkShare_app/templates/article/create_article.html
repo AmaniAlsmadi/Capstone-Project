@@ -3,6 +3,8 @@
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/create_article.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+
 {% endblock %}
 {% block content %}
 <div class="container mt-4">
@@ -19,4 +21,8 @@
     </form>
 </div>
 
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js" defer></script>
+<script src="{% static 'js/markdown.js' %}" defer></script>
+{% endblock %}
 {% endblock %}

@@ -41,7 +41,7 @@
     </div>
 
     <div class="article-content">
-        <p>{{ article.content|linebreaks }}</p>
+        <p>{{ article.formatted_content|safe }}</p>
         {% if article.link %}
         <p><a href="{{ article.link }}" target="_blank">Article Link</a></p>
         {% endif %}

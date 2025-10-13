@@ -36,8 +36,8 @@ class ArticleForm(forms.ModelForm):
         model = Article
         fields = ['title', 'content', 'link', 'category']
         widgets = {
-            'content': forms.Textarea(attrs={'rows': 8}),
-        }
+    'content': forms.Textarea(attrs={'rows': 8, 'id': 'content'}),
+}
 
 class CommentForm(forms.ModelForm):
    class Meta:

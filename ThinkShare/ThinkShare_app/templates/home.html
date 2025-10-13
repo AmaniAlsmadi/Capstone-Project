@@ -20,7 +20,7 @@
 
     <div class="card-content">
       <h2>{{ article.title }}</h2>
-      <p>{{ article.content|truncatechars:100 }}</p>
+      <p>{{ article.formatted_content|truncatechars:100 }}</p>
       <span class="category">{{ article.category.category_name }}</span>
       <span class="author" >By: {{ article.user.username }}</span>
       <small>{{ article.created_at }}</small>
