@@ -3,6 +3,8 @@
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/update_article.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+
 {% endblock %}
 {% block content %}
 <div class="container mt-4">
@@ -10,9 +12,33 @@
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-                <div class="form-buttons">
-        <button type="submit" class="btn btn-primary">Update Article</button>
-        <a href="{% url 'details' pk=article.pk %}" class="btn btn-secondary">Cancel</a>
-    </div></form>
+
+        <label for="images">Add More Images (Ctrl+Click to select multiple)</label>
+        <input type="file" name="images" id="images" multiple>
+        <div id="preview" class="image-preview"></div>
+
+        {% if images %}
+        <h5>Existing Images:</h5>
+        <div class="existing-images">
+            {% for img in images %}
+            <div class="image-wrapper">
+                <img src="{{ img.image_url.url }}" alt="Article Image" width="150">
+                <a href="{% url 'image_delete' article.id img.id %}">Delete</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary">Update Article</button>
+            <a href="{% url 'details' pk=article.pk %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
 </div>
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js" defer></script>
+<script src="{% static 'js/markdown.js' %}" defer></script>
+<script src="{% static 'js/preview_images.js' %}" defer></script>
+
+{% endblock %}
 {% endblock %}

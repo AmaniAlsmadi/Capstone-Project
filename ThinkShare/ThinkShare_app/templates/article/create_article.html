@@ -4,7 +4,6 @@
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/create_article.css' %}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-
 {% endblock %}
 {% block content %}
 <div class="container mt-4">
@@ -15,6 +14,8 @@
 
         <label for="images" class="label">Upload Images (Ctrl + Click to select multiple)</label>
         <input type="file" name="images" id="images" multiple>
+        <div id="preview" class="image-preview"></div>
+
         <div class="form-buttons">
             <button type="submit" class="btn">Add</button>
         </div>
@@ -24,5 +25,7 @@
 {% block extra_scripts %}
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js" defer></script>
 <script src="{% static 'js/markdown.js' %}" defer></script>
+<script src="{% static 'js/preview_images.js' %}" defer></script>
+
 {% endblock %}
 {% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/contact.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>CONTACT US</h2>
+
+<form  method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+        {{ form.as_p }}
+        <div class="form-buttons">
+            <button type="submit" class="btn">SEND</button>
+        </div>
+</form>
+</div>
+{% if success %}
+<script>
+    Swal.fire({
+        title: 'Success!',
+        text: 'Your message has been sent.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+    });
+</script>
+{% endif %}
+{% endblock %}

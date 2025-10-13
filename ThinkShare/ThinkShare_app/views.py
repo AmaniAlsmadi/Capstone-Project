@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Article, ArticleImages,Vote,Comment
+from .models import Article, ArticleImages,Vote,Comment,BookMark
 from django.contrib.auth.views import LoginView
-from .forms import CustomUserCreationForm, ArticleForm,CommentForm
+from .forms import CustomUserCreationForm, ArticleForm,CommentForm,ContactForm
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -11,6 +11,9 @@ from django.urls import reverse
 
 def home(request):
     articles = Article.objects.all()
+    if request.user.is_authenticated:
+        for article in articles:
+            article.is_bookmarked = article.bookmark_set.filter(user=request.user).exists()
     return render(request, 'home.html', {'articles': articles})
 
 def about(request):
@@ -47,13 +50,11 @@ def create_article(request):
             files = request.FILES.getlist('images')
             for f in files:
                 ArticleImages.objects.create(article=article, image_url=f)
-
-            return redirect('home')
-        
+            return redirect('details', article.id)
     else:
         form = ArticleForm()
-
     return render(request, 'article/create_article.html', {'form': form})
+
 
 def article_details(request, pk):
     article = get_object_or_404(Article, pk=pk)
@@ -103,12 +104,26 @@ def update_article(request, pk):
     if request.method == 'POST':
         form = ArticleForm(request.POST, request.FILES, instance=article)
         if form.is_valid():
-            form.save()
-            return redirect('details', pk=pk)
+            updated_article = form.save(commit=False)
+            updated_article.user = request.user 
+            updated_article.save()
+
+            files = request.FILES.getlist('images')
+            for f in files:
+                ArticleImages.objects.create(article=updated_article, image_url=f)
+
+            return redirect('details', updated_article.id)
     else:
         form = ArticleForm(instance=article)
-    return render(request, 'article/update_article.html', {'form': form, 'article': article})
 
+    images = article.articleimages_set.all()
+    return render(request, 'article/update_article.html', {'form': form, 'article': article,'images': images})
+
+@login_required
+def delete_article_image(request, article_id, pk):
+    img = get_object_or_404(ArticleImages, id=pk, article__user=request.user)
+    img.delete()
+    return redirect('article_edit', pk=article_id)
 
 @login_required
 def delete_article(request, pk):
@@ -169,3 +184,46 @@ def profile_view(request):
         'user_votes': user_votes
     })
 
+@login_required
+def toggle_bookmark(request, article_id):
+    article = get_object_or_404(Article, id=article_id)
+    bookmark, created = BookMark.objects.get_or_create(user=request.user, article=article)
+    if not created:
+        bookmark.delete()
+    
+    return redirect('home')
+
+
+def contact(request):
+    success = False
+    if request.method == 'POST':
+        form = ContactForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            success = True  
+            form = ContactForm() 
+    else:
+        form = ContactForm()
+    
+    return render(request, 'contact.html', {'form': form,'success': success})
+
+
+@login_required
+def bookmark_view(request):
+    bookmarks = (
+        BookMark.objects
+        .filter(user=request.user)
+        .select_related('article', 'article__category', 'article__user')
+        .prefetch_related('article__articleimages_set')
+    )
+    return render(request, 'book_mark_list.html', {'bookmark': bookmarks})
+
+
+@login_required
+def togglelist_bookmark(request, article_id):
+    article = get_object_or_404(Article, id=article_id)
+    bookmark, created = BookMark.objects.get_or_create(user=request.user, article=article)
+    if not created:
+        bookmark.delete()
+
+    return redirect('bookmark')

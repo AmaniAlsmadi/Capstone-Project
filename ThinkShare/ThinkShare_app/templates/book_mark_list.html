@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/book_mark_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<section>
+  {% for mark in bookmark %}
+    <a href="{% url 'togglelist_bookmark' mark.article.id %}" class="bookmark active">
+      <i class="fa-solid fa-bookmark fa-2xl"></i>
+    </a>
+
+    <a href="{% url 'details' mark.article.id %}" class="card-link">
+      <div class="card">
+        <div class="card-image">
+          {% if mark.article.articleimages_set.first %}
+            <img src="{{ mark.article.articleimages_set.first.image_url.url }}" alt="article_image">
+          {% else %}
+            <img src="{% static 'images/no-image-available.png' %}" alt="no-image">
+          {% endif %}
+        </div>
+
+        <div class="card-content">
+          <h2>{{ mark.article.title }}</h2>
+          <p>{{ mark.article.formatted_content|truncatechars:100 }}</p>
+          <span class="category">{{ mark.article.category.category_name }}</span>
+          <span class="author">By: {{ mark.article.user.username }}</span>
+          <small>{{ mark.article.created_at }}</small>
+        </div>
+      </div>
+    </a>
+  {% endfor %}
+</section>
+{% endblock %}

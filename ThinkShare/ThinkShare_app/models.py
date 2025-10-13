@@ -86,13 +86,12 @@ class BookMark(models.Model):
     
 
 class Contact(models.Model):
-    full_name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100)
-    subject = models.CharField(max_length=100)
-    content = models.TextField(max_length=500)
-    sent_at = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField(default="")
+    send_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.full_name} - {self.subject}"
+        return self.name
 
 

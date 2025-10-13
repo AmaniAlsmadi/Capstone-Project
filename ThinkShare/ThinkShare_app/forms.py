@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
-from .models import Article,Comment
+from .models import Article,Comment,Contact
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True, help_text="Enter a valid email address")
@@ -46,3 +46,8 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write your comment...'}),
         }
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model=Contact
+        fields = ['name', 'email', 'message']
