@@ -7,60 +7,72 @@
 
 {% block content %}
 <section class="articles-list">
-  {% for mark in bookmark %}
 
-  <div class="card">
-    <a href="{% url 'details' mark.article.id %}" class="card-link">
-      <div class="card-image">
-        {% if mark.article.articleimages_set.first %}
-        <img src="{{ mark.article.articleimages_set.first.image_url.url }}" alt="article_image">
-        {% else %}
-        <img src="{% static 'images/no-image-available.png' %}" alt="no-image">
-        {% endif %}
-      </div>
-    </a>
+  {% if bookmark %}
+    {% for mark in bookmark %}
+    <div class="card">
+      <a href="{% url 'details' mark.article.id %}" class="card-link">
+        <div class="card-image">
+          {% if mark.article.articleimages_set.first %}
+          <img src="{{ mark.article.articleimages_set.first.image_url.url }}" alt="article_image">
+          {% else %}
+          <img src="{% static 'images/no-image-available.png' %}" alt="no-image">
+          {% endif %}
+        </div>
+      </a>
 
-    <div class="card-content">
-      <div class="bookmark">
-        <a href="{% url 'togglelist_bookmark' mark.article.id %}" class="bookmark-link active">
-          <i class="fa-solid fa-bookmark fa-2xl"></i>
-          <span class="tooltip-text">Un Save Article</span>
-        </a>
-      </div>
-      <div class="info">
-        <a href="{% url 'details' mark.article.id %}">
-          <h2>{{ mark.article.title }}</h2>
-          <p> {{ mark.article.formatted_content|truncatechars:100 }}</p>
-          <div>
-            <span class="author">By: {{ mark.article.user.username }}</span>
-          </div>
-          <div>
-            <span class="category">{{ mark.article.category.category_name }}</span>
-            <small class="votes">Votes: {{ mark.article.vote_count }}</small>
-          </div>
-          <div class="date">
-            <small> {{ mark.article.created_at }}</small>
-          </div>
-        </a>
+      <div class="card-content">
+        <div class="bookmark">
+          <a href="{% url 'togglelist_bookmark' mark.article.id %}" class="bookmark-link active">
+            <i class="fa-solid fa-bookmark fa-2xl"></i>
+            <span class="tooltip-text">Unsave Article</span>
+          </a>
+        </div>
+        <div class="info">
+          <a href="{% url 'details' mark.article.id %}">
+            <h2>{{ mark.article.title }}</h2>
+            <p>{{ mark.article.formatted_content|truncatechars:100 }}</p>
+            <div>
+              <span class="author">By: {{ mark.article.user.username }}</span>
+            </div>
+            <div>
+              <span class="category">{{ mark.article.category.category_name }}</span>
+              <small class="votes">Votes: {{ mark.article.vote_count }}</small>
+            </div>
+            <div class="date">
+              <small>{{ mark.article.created_at }}</small>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
+    {% endfor %}
+
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+      <a
+        href="?page={{ page_obj.previous_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if author_name %}&author_name={{ author_name }}{% endif %}">
+        <i class="fa-solid fa-chevron-left"></i>
+      </a>
+      {% endif %}
+
+      <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+      {% if page_obj.has_next %}
+      <a
+        href="?page={{ page_obj.next_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if author_name %}&author_name={{ author_name }}{% endif %}">
+        <i class="fa-solid fa-chevron-right"></i>
+      </a>
+      {% endif %}
+    </div>
+
+  {% else %}
+  <div class="empty-state">
+    <h2>No saved articles yet</h2>
+    <p>Start exploring and bookmark your favorite articles!</p>
+    <a href="{% url 'articles' %}" class="btn btn-primary">Browse Articles</a>
   </div>
-  {% endfor %}
+  {% endif %}
 
-  <div class="pagination">
-    {% if page_obj.has_previous %}
-    <a
-      href="?page={{ page_obj.previous_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if author_name %}&author_name={{ author_name }}{% endif %}"><i
-        class="fa-solid fa-chevron-left"></i></a>
-    {% endif %}
-
-    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-
-    {% if page_obj.has_next %}
-    <a
-      href="?page={{ page_obj.next_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if author_name %}&author_name={{ author_name }}{% endif %}">
-      <i class="fa-solid fa-chevron-right"></i></a>
-    {% endif %}
-  </div>
 </section>
 {% endblock %}

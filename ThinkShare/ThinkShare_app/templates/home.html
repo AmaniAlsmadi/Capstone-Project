@@ -57,8 +57,7 @@
           <a href="{% url 'details' New_article.id %}">
             <h3>{{ New_article.title }}</h3>
           </a>
-          <p>{{ New_article.formatted_content|truncatechars:120 }}</p>
-          <div>
+          <div class="article-meta">
             <span>By: {{ New_article.user.username }}</span> ·
             <small>{{ New_article.created_at|date:"M d, Y" }}</small>
           </div>

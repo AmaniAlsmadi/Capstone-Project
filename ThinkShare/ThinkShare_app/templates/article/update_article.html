@@ -7,6 +7,7 @@
 
 {% endblock %}
 {% block content %}
+<div class="page">
 <div class="container mt-4">
     <h2>Edit Article</h2>
     <form method="POST" enctype="multipart/form-data">
@@ -35,6 +36,7 @@
             <a href="{% url 'details' pk=article.pk %}" class="btn2 btn-secondary">Cancel</a>
         </div>
     </form>
+</div>
 </div>
 
 {% block extra_scripts %}
