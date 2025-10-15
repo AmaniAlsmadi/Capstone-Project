@@ -51,7 +51,7 @@ Visitors can read engaging posts, access detailed information about each article
 
 ## 🧮 Entity-Relationship Diagram (ERD)
 
-![ERD](./ThinkShare_app/static/images/erdplus.png)
+![ERD](./ThinkShare/ThinkShare_app/static/images/erdplus.png)
 
 ---
 
