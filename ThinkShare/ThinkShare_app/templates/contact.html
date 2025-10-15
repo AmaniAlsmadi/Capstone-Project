@@ -8,17 +8,21 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>CONTACT US</h2>
+<section class="contact-section">
+  <div class="contact-wrapper">
+    <div class="contact-info">
+      <h2>Get in Touch</h2>
+      <p>We’d love to hear from you! Whether you have a question or just want to say hi.</p>
+    </div>
 
-<form  method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-        {{ form.as_p }}
-        <div class="form-buttons">
-            <button type="submit" class="btn">SEND</button>
-        </div>
-</form>
-</div>
+    <form class="contact-form" method="POST">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn_send">SEND</button>
+    </form>
+  </div>
+</section>
+
 {% if success %}
 <script>
     Swal.fire({

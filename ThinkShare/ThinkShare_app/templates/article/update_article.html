@@ -22,15 +22,17 @@
         <div class="existing-images">
             {% for img in images %}
             <div class="image-wrapper">
-                <img src="{{ img.image_url.url }}" alt="Article Image" width="150">
-                <a href="{% url 'image_delete' article.id img.id %}">Delete</a>
+                <img src="{{ img.image_url.url }}" alt="Article Image">
+                <a href="{% url 'image_delete' article.id img.id %}" class="delete-btn">
+                    <i class="fa-solid fa-x"></i>
+                </a>
             </div>
             {% endfor %}
         </div>
         {% endif %}
         <div class="form-buttons">
-            <button type="submit" class="btn btn-primary">Update Article</button>
-            <a href="{% url 'details' pk=article.pk %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn-update">Update Article</button>
+            <a href="{% url 'details' pk=article.pk %}" class="btn2 btn-secondary">Cancel</a>
         </div>
     </form>
 </div>

@@ -11,8 +11,8 @@
         {% csrf_token %}
         {{ form.as_p }}
         <div class="form-buttons">
-        <button type="submit" class="btn">Update</button>
-        <a href="{% url 'details' pk=comment.article.pk %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn-update">Update</button>
+        <a href="{% url 'details' pk=comment.article.pk %}" class="btn2 btn-secondary">Cancel</a>
    </div> </form>
 </div>
 {% endblock %}

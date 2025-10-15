@@ -8,9 +8,9 @@
 {% block content %}
 <section class="articles-section">
   <div class="sidebar">
-    <form method="get">
+    <form method="get" class="filter">
       <h3>Filters</h3>
-
+<div>
       <label for="sort_by">Sort by:</label>
       <select name="sort_by" id="sort_by" onchange="this.form.submit()">
         <option value="created_at" {% if sort_by == 'created_at' %}selected{% endif %}>Latest</option>
@@ -18,7 +18,8 @@
         <option value="author" {% if sort_by == 'author' %}selected{% endif %}>Author</option>
         <option value="category" {% if sort_by == 'category' %}selected{% endif %}>Category</option>
       </select>
-
+</div>
+<div>
       <label for="category">Category:</label>
       <select name="category" id="category" onchange="this.form.submit()">
         <option value="">All Categories</option>
@@ -28,48 +29,76 @@
         </option>
         {% endfor %}
       </select>
-
+</div>
+<div>
       <label for="author_name">Author:</label>
       <input type="text" name="author_name" id="author_name" value="{{ author_name }}" placeholder="Author username">
-      <button type="submit">Filter</button>
-    </form>
+</div>
+<div>
+      <button type="submit" class="btn_filter">Search</button>
+  </div>  
+</form>
   </div>
 
   <div class="articles-list">
     {% for article in articles %}
-    {% if user.is_authenticated %}
-      {% if article.is_bookmarked %}
-        <a href="{% url 'toggle_bookmark' article.id %}" class="bookmark active">
-          <i class="fa-solid fa-bookmark fa-2xl"></i>
-        </a>
-      {% else %}
-        <a href="{% url 'toggle_bookmark' article.id %}" class="bookmark">
-          <i class="fa-regular fa-bookmark fa-2xl"></i>
-        </a>
-      {% endif %}
-    {% endif %}
 
-    <a href="{% url 'details' article.id %}" class="card-link">
-      <div class="card">
+    <div class="card">
+      <a href="{% url 'details' article.id %}" class="card-link">
         <div class="card-image">
           {% if article.articleimages_set.first %}
-            <img src="{{ article.articleimages_set.first.image_url.url }}" alt="article_image">
+          <img src="{{ article.articleimages_set.first.image_url.url }}" alt="article_image">
           {% else %}
-            <img src="{% static 'images/no-image-available.png' %}" alt="no-image">
+          <img src="{% static 'images/no-image-available.png' %}" alt="no-image">
           {% endif %}
         </div>
-        <div class="card-content">
-          <h2>{{ article.title }}</h2>
-          <p>{{ article.formatted_content|truncatechars:100 }}</p>
-          <span class="category">{{ article.category.category_name }}</span>
-          <span class="author">By: {{ article.user.username }}</span>
-          <small>{{ article.created_at }}</small>
-          <small>Votes: {{ article.vote_count }}</small>
+      </a>
+      <div class="card-content">
+        {% if user.is_authenticated %}
+        <div class="bookmark">
+          <a class="bookmark-link" href="{% url 'toggle_bookmark' article.id %}" onclick="event.stopPropagation();">
+            {% if article.is_bookmarked %}
+            <i class="fa-solid fa-bookmark fa-2xl"></i>
+            {% else %}
+            <i class="fa-regular fa-bookmark fa-2xl"></i>
+            {% endif %}
+             <span class="tooltip-text">Save Article</span>
+          </a>
         </div>
+        {% endif %}
+        <div class="info">
+          <a href="{% url 'details' article.id %}">
+            <h2>{{ article.title }}</h2>
+            <p> {{ article.formatted_content|truncatechars:100 }}</p>
+           <div>
+            <span class="author">By: {{ article.user.username }}</span>
+           </div>
+            <div>
+            <span class="category">{{ article.category.category_name }}</span>
+            <small class="votes">Votes: {{ article.vote_count }}</small> 
+          </div>
+            <div class="date">
+           <small > {{ article.created_at }}</small>
+          </div>
+          </a>
+        </div>
+
       </div>
-    </a>
+    </div>
     {% endfor %}
   </div>
+
+  <div class="pagination">
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if author_name %}&author_name={{ author_name }}{% endif %}"><i class="fa-solid fa-chevron-left"></i></a>
+  {% endif %}
+
+  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if author_name %}&author_name={{ author_name }}{% endif %}">  <i class="fa-solid fa-chevron-right"></i></a>
+  {% endif %}
+</div>
 </section>
 
 {% endblock %}

@@ -8,22 +8,23 @@
 {% block content %}
 <div class="dashboard-container">
 
-  <div class="sidebar">
-      <button class="tab-btn active" onclick="openTab(event, 'user')">My Profile</button>
-      <button class="tab-btn" onclick="openTab(event, 'update')">Update Profile</button>
-      <button class="tab-btn" onclick="openTab(event, 'password')">Change Password</button>
-      <button class="tab-btn" onclick="openTab(event, 'articles')">My Articles</button>
-      <button class="tab-btn" onclick="openTab(event, 'comments')">Comments</button>
-      <button class="tab-btn" onclick="openTab(event, 'votes')">Votes</button>
-  </div>
+<div class="sidebar">
+  <button class="tab-btn active" onclick="openTab(event, 'user')"><i class="fa-solid fa-user"></i><span>My Profile</span></button>
+  <button class="tab-btn" onclick="openTab(event, 'update')"><i class="fa-solid fa-pen-to-square"></i><span>Update Profile</span></button>
+  <button class="tab-btn" onclick="openTab(event, 'password')"><i class="fa-solid fa-key"></i><span>Change Password</span></button>
+  <button class="tab-btn" onclick="openTab(event, 'articles')"><i class="fa-solid fa-newspaper"></i><span>My Articles</span></button>
+  <button class="tab-btn" onclick="openTab(event, 'comments')"><i class="fa-solid fa-comments"></i><span>Comments</span></button>
+  <button class="tab-btn" onclick="openTab(event, 'votes')"><i class="fa-solid fa-thumbs-up"></i><span>Votes</span></button>
+</div>
 
   <div class="content">
 
       <div id="user" class="tab-content" style="display: block;">
-          <h2>{{ user.username }}'s Profile</h2>
+          <h2>{{ user.first_name }}'s Profile</h2>
           <div class="user-info">
               <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
               <p><strong>Email:</strong> {{ user.email }}</p>
+              <p><strong>User Name:</strong>{{ user.username }}</p>
           </div>
       </div>
 

@@ -7,28 +7,22 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.urls import reverse
+from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.hashers import check_password
-from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 
 
 def home(request):
-    latest_articles = Article.objects.select_related('user').order_by('-created_at')[:6]
-    categories = Categories.objects.all()[:6]
+    latest_articles = Article.objects.select_related('user').order_by('-created_at')[:3]
     trending_articles = (
         Article.objects.annotate(vote_count=Count('votes'))
-        .order_by('-vote_count')[:6]
-    )
-    top_authors = (
-        User.objects.annotate(article_count=Count('article'))
-        .order_by('-article_count')[:6]
+        .order_by('-vote_count')[:4]
     )
 
     return render(request, 'home.html', {
         'latest_articles': latest_articles,
-        'categories': categories,
         'trending_articles': trending_articles,
-        'top_authors': top_authors
     })
 
 def articles(request):
@@ -59,12 +53,18 @@ def articles(request):
 
     categories = Categories.objects.all()
 
+    paginator = Paginator(articles, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'article/articles_view.html', {
         'articles': articles,
         'sort_by': sort_by,
         'categories': categories,
         'selected_category': category_id,
-        'author_name': author_name
+        'author_name': author_name,
+        'articles': page_obj,
+        'page_obj': page_obj,
     })
 
 class CustomLoginView(LoginView):
@@ -272,7 +272,7 @@ def toggle_bookmark(request, article_id):
     if not created:
         bookmark.delete()
     
-    return redirect('home')
+    return redirect('articles')
 
 
 def contact(request):
@@ -297,7 +297,14 @@ def bookmark_view(request):
         .select_related('article', 'article__category', 'article__user')
         .prefetch_related('article__articleimages_set')
     )
-    return render(request, 'book_mark_list.html', {'bookmark': bookmarks})
+    paginator = Paginator(bookmarks, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'book_mark_list.html', {
+        'bookmark': bookmarks,
+        'articles': page_obj,
+        'page_obj': page_obj,})
 
 
 @login_required

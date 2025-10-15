@@ -7,121 +7,122 @@
 
 {% block content %}
 <div class="article-container">
+    <div class="content">
+        <div class="article-header">
+            <h1>{{ article.title }}</h1>
 
-    <div class="article-header">
-        <h1>{{ article.title }}</h1>
-
-        {% if user.is_authenticated and user == article.user %}
-        <details class="menu-three-dot">
-            <summary><i class="fa-solid fa-ellipsis-vertical"></i></summary>
-            <div class="menu-dropdown">
-                <a href="{% url 'article_edit' article.pk %}">Edit</a>
-                <a href="{% url 'article_delete' article.pk %}" class="delete-link">Delete</a>
-            </div>
-        </details>
-        {% endif %}
-    </div>
-
-    <div class="article-meta">
-        <span>{{ article.category.category_name }}</span>
-        <span>By: {{ article.user.username }}</span>
-        <span>{{ article.created_at|date:"F j, Y, g:i a" }}</span>
-    </div>
-
-    <div id="slider-{{ article.id }}" class="image-slider">
-        <div class="slides">
-            {% for img in article.articleimages_set.all %}
-            <div class="slide"><img src="{{ img.image_url.url }}" alt="Article image"></div>
-            {% empty %}
-            <div class="slide"><img src="{% static 'images/no-image-available.png' %}" alt="No image"></div>
-            {% endfor %}
+            {% if user.is_authenticated and user == article.user %}
+            <details class="menu-three-dot">
+                <summary><i class="fa-solid fa-ellipsis-vertical"></i></summary>
+                <div class="menu-dropdown">
+                    <a href="{% url 'article_edit' article.pk %}">Edit</a>
+                    <a href="{% url 'article_delete' article.pk %}" class="delete-link">Delete</a>
+                </div>
+            </details>
+            {% endif %}
         </div>
-        <button class="prev" onclick="prevSlide('{{ article.id }}')">&#10094;</button>
-        <button class="next" onclick="nextSlide('{{ article.id }}')">&#10095;</button>
-    </div>
 
-    <div class="article-content">
-        <p>{{ article.formatted_content|safe }}</p>
-        {% if article.link %}
-        <p><a href="{{ article.link }}" target="_blank">Article Link</a></p>
-        {% endif %}
-    </div>
+        <div class="article-meta">
+            <span>{{ article.category.category_name }}</span>
+            <span>By: {{ article.user.username }}</span>
+            <span>{{ article.created_at|date:"F j, Y, g:i a" }}</span>
+        </div>
 
+        <div id="slider-{{ article.id }}" class="image-slider">
+            <div class="slides">
+                {% for img in article.articleimages_set.all %}
+                <div class="slide"><img src="{{ img.image_url.url }}" alt="Article image"></div>
+                {% empty %}
+                <div class="slide"><img src="{% static 'images/no-image-available.png' %}" alt="No image"></div>
+                {% endfor %}
+            </div>
+            <button class="prev" onclick="prevSlide('{{ article.id }}')">&#10094;</button>
+            <button class="next" onclick="nextSlide('{{ article.id }}')">&#10095;</button>
+        </div>
+       
+
+        <div class="article-content">
+            <p>{{ article.formatted_content|safe }}</p>
+            {% if article.link %}
+            <p><a href="{{ article.link }}" target="_blank">Article Link</a></p>
+            {% endif %}
+        </div>
+ <div class="vote-section">
+            {% if user.is_authenticated %}
+            <form method="POST" class="vote-form">
+                {% csrf_token %}
+                <button type="submit" name="vote" value="1">
+                    {% if user_liked %}
+                    <i class="fa-solid fa-thumbs-up"></i>
+                    {% else %}
+                    <i class="fa-regular fa-thumbs-up"></i>
+                    {% endif %}
+                    <span>{{ article.likes_count }}</span>
+                </button>
+            </form>
+
+            <form method="POST" class="vote-form">
+                {% csrf_token %}
+                <button type="submit" name="vote" value="-1">
+                    {% if user_disliked %}
+                    <i class="fa-solid fa-thumbs-down"></i>
+                    {% else %}
+                    <i class="fa-regular fa-thumbs-down"></i>
+                    {% endif %}
+                    <span>{{ article.dislikes_count }}</span>
+                </button>
+            </form>
+            {% else %}
+            <p><a href="{% url 'login' %}">Login</a> to vote.</p>
+            {% endif %}
+        </div>
+
+    </div>
     <hr>
+    <div class="content">
+        <div class="comments-section">
+            <h3>Comments ({{ comments.count }})</h3>
 
-    <div class="vote-section">
-        {% if user.is_authenticated %}
-        <form method="POST" class="vote-form">
-            {% csrf_token %}
-            <button type="submit" name="vote" value="1">
-                {% if user_liked %}
-                <i class="fa-solid fa-thumbs-up"></i>
-                {% else %}
-                <i class="fa-regular fa-thumbs-up"></i>
-                {% endif %}
-                <span>{{ article.likes_count }}</span>
-            </button>
-        </form>
+            {% for comment in comments %}
+            <div class="comment-box">
+                <div class="comment-header">
+                    <div>
+                        <strong>{{ comment.user.username }}</strong>
+                        <small class="text-muted">• {{ comment.created_at|timesince }} ago</small>
+                    </div>
 
-        <form method="POST" class="vote-form">
-            {% csrf_token %}
-            <button type="submit" name="vote" value="-1">
-                {% if user_disliked %}
-                <i class="fa-solid fa-thumbs-down"></i>
-                {% else %}
-                <i class="fa-regular fa-thumbs-down"></i>
-                {% endif %}
-                <span>{{ article.dislikes_count }}</span>
-            </button>
-        </form>
-        {% else %}
-        <p><a href="{% url 'login' %}">Login</a> to vote.</p>
-        {% endif %}
-    </div>
-
-    <hr>
-
-    <div class="comments-section">
-        <h3>Comments ({{ comments.count }})</h3>
-
-        {% for comment in comments %}
-        <div class="comment-box">
-            <div class="comment-header">
-                <div>
-                    <strong>{{ comment.user.username }}</strong>
-                    <small class="text-muted">• {{ comment.created_at|timesince }} ago</small>
+                    {% if user.is_authenticated and user == comment.user %}
+                    <details class="menu-three-dot">
+                        <summary><i class="fa-solid fa-ellipsis-vertical"></i></summary>
+                        <div class="menu-dropdown">
+                            <a href="{% url 'comment_edit' comment.pk %}">Edit</a>
+                            <a href="{% url 'comment_delete' comment.pk %}" class="delete-link">Delete</a>
+                        </div>
+                    </details>
+                    {% endif %}
                 </div>
 
-                {% if user.is_authenticated and user == comment.user %}
-                <details class="menu-three-dot">
-                    <summary><i class="fa-solid fa-ellipsis-vertical"></i></summary>
-                    <div class="menu-dropdown">
-                        <a href="{% url 'comment_edit' comment.pk %}">Edit</a>
-                        <a href="{% url 'comment_delete' comment.pk %}" class="delete-link">Delete</a>
-                    </div>
-                </details>
-                {% endif %}
+                <p class="comment-text">{{ comment.content }}</p>
             </div>
-
-            <p class="comment-text">{{ comment.content }}</p>
+            {% empty %}
+            <p class="text-muted">No comments yet. Be the first to comment!</p>
+            {% endfor %}
         </div>
-        {% empty %}
-        <p class="text-muted">No comments yet. Be the first to comment!</p>
-        {% endfor %}
-    </div>
 
-    {% if user.is_authenticated %}
-    <hr>
-    <div class="comment-form">
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" name="comment">Add</button>
-        </form>
+        {% if user.is_authenticated %}
+        <div class="comment-form">
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="form-buttons">
+                    <button type="submit" name="comment">Add</button>
+                </div>
+            </form>
+        </div>
+        {% else %}
+        <p><a href="{% url 'login' %}" class="text-decoration-none">Login</a> to comment.</p>
+        {% endif %}
     </div>
-    {% else %}
-    <p><a href="{% url 'login' %}" class="text-decoration-none">Login</a> to comment.</p>
-    {% endif %}
 </div>
 
 <script src="{% static 'js/slider.js' %}"></script>

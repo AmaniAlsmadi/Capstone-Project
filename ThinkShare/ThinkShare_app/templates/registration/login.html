@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="login_page">
 <div class="container mt-4">
     <h2><i class="fa-regular fa-newspaper"></i> Welcome Back to ThinkShare</h2>
     <p class="subtitle">Sign in to continue exploring new article!</p>
@@ -19,12 +20,13 @@
         {{ form.as_p }}
         <input type="hidden" name="next" value="{{ next }}">
         <div class="form-buttons">
-            <button type="submit" class="btn">Login</button>
+            <button type="submit" class="btn_login">Login</button>
         </div>
     </form>
 
     <p class="register-link">
         Don’t have an account? <a href="{% url 'signup' %}">Sign up here</a>
     </p>
+</div>
 </div>
 {% endblock %}

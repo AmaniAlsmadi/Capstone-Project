@@ -1,26 +1,38 @@
 .article-container {
-  max-width: 800px;
+  display: flex;
+  flex-direction: row;
   margin: 40px auto;
   padding: 24px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  margin-top: 90px;
 }
-
+.article-container .content{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
 .article-header {
   position: relative;
   padding-right: 40px;
+  min-width: 800px;
 }
 
 .article-header h1 {
-  font-size: 28px;
-  color: rgb(101,130,253);
+  font-size: 30px;
   margin: 0;
+  font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
 }
 
 .menu-three-dot {
   position: absolute;
-  right: 0;
+  right: 10px;
   top: 0;
 }
 .comment-header {
@@ -80,6 +92,9 @@
   gap: 16px;
   flex-wrap: wrap;
 }
+.article-content{
+  width: 600px;
+}
 .article-content p {
   font-size: 16px;
   line-height: 1.7;
@@ -94,11 +109,11 @@
 
 .image-slider {
   position: relative;
-  width: 100%;
+  width: 600px;
   max-height: 450px;
   overflow: hidden;
   border-radius: 12px;
-  margin: 24px 0;
+  margin: 24px 24px;
 }
 
 .slides {
@@ -154,33 +169,41 @@
 
 .vote-form button {
   background: none;
+  color:#4571f7;
   border: none;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
 .vote-form i {
-  font-size: 30px;
+  font-size: 25px;
+  color:#4571f7;
 }
-
+.article-content p a {
+ text-decoration: none;
+}
 .comments-section {
-  margin-top: 40px;
+  width: 100%;
   padding: 20px;
   background: #f9f9ff;
   border-radius: 12px;
+  margin: 20px 20px;
 }
-
+.comments-section h3 {
+  text-align: center;
+}
 .comment-box {
+  width: 400px;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 10px;
   padding: 15px;
-  margin-bottom: 15px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   cursor: pointer;
+  margin: 20px 20px;
 }
 
 .comment-header {
@@ -190,6 +213,7 @@
 }
 
 .comment-text {
+  text-align: start;
   margin-top: 8px;
   font-size: 15px;
   color: #333;
@@ -201,12 +225,13 @@
 }
 
 .comment-form {
-  margin-top: 30px;
+  width: 500px;
   padding: 25px;
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid #e5e7eb;
+  margin: 20px 20px;
 }
 
 .comment-form textarea {
@@ -217,14 +242,20 @@
   background: #fafafa;
   font-size: 15px;
 }
-
+.form-buttons {
+  text-align: center;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 .comment-form button {
   margin-top: 15px;
   background: rgb(101, 130, 253);
   color: #fff;
   padding: 10px 24px;
   border: none;
-  border-radius: 25px;
+  border-radius: 6px;
   font-size: 15px;
   cursor: pointer;
   transition: background 0.3s;
@@ -234,9 +265,24 @@
   background: rgb(121, 144, 245);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .article-container {
-    padding: 16px;
-    margin: 16px;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .article-section,
+  .comments-section {
+    width: 100%;
+  }
+
+  .comments-section {
+    max-height: none;
+  }
+
+  .article-header h1 {
+    font-size: 26px;
   }
 }

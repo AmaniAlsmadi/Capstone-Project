@@ -6,5 +6,78 @@
 {% endblock %}
 
 {% block content %}
+<div class="home_page">
+  <section class="slider_section">
+    <div id="slider" class="image-slider">
+      <div class="slides">
+        {% for article in trending_articles %}
+        <div class="slide">
+          {% if article.articleimages_set.first %}
+          <img src="{{ article.articleimages_set.first.image_url.url }}" alt="article_image">
+          {% else %}
+          <img src="{% static 'images/no-image-available.png' %}" alt="no-image">
+          {% endif %}
+          <div class="info">
+            <a href="{% url 'details' article.id %}">
+              <h2>{{ article.title }}</h2>
+              <span>By: {{ article.user.username }}</span>
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <button class="prev" onclick="prevSlide()">&#10094;</button>
+      <button class="next" onclick="nextSlide()">&#10095;</button>
+    </div>
+
+
+  </section>
+  <section class="about-section">
+    <h2 class="section-title">ThinkShare Website</h2>
+    <p class="about-text">
+      This website shares insightful articles, updates, and stories to keep you informed and inspired.
+      Browse trending articles, explore the newest content, and stay engaged with our community.
+    </p>
+  </section>
+
+
+  <section class="newest-section">
+    <h2 class="section-title">Newest Articles</h2>
+
+    <div class="articles-grid">
+      {% for New_article in latest_articles %}
+      <div class="article-card">
+        {% if New_article.articleimages_set.first %}
+        <img src="{{ New_article.articleimages_set.first.image_url.url }}" alt="article_image">
+        {% else %}
+        <img src="{% static 'images/no-image-available.png' %}" alt="no-image">
+        {% endif %}
+        <div class="article-info">
+          <a href="{% url 'details' New_article.id %}">
+            <h3>{{ New_article.title }}</h3>
+          </a>
+          <p>{{ New_article.formatted_content|truncatechars:120 }}</p>
+          <div>
+            <span>By: {{ New_article.user.username }}</span> ·
+            <small>{{ New_article.created_at|date:"M d, Y" }}</small>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+
+  {% if not user.is_authenticated %}
+  <section class="signup-section">
+    <h2 class="section-title">Join Our Community</h2>
+    <p>Sign up to receive updates, submit your own articles, and interact with other users!</p>
+    <a href="{% url 'signup' %}" class="btn-signup">Sign Up</a>
+  </section>
+  {% endif %}
+</div>
+
+<script src="{% static 'js/home_slider.js' %}"></script>
 
 {% endblock %}
